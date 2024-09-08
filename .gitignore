@@ -1,0 +1,5 @@
+config.json
+
+bin/
+obj/
+cookie*
