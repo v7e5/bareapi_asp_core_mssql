@@ -10,7 +10,8 @@ EOL
 x() {
 cat <<EOL
 {
-  "username": "admin",
+  "n": 19,
+  "username": "xxx",
   "passwd": "forget"
 }
 EOL

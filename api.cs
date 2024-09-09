@@ -1,4 +1,7 @@
 ﻿class Auth: IMiddleware {
+  private static readonly string[] noauth = {
+    "login", "hailstone", "echo", "env", "now"
+  }; 
   private readonly HttpContext? ctx;
   private readonly SqlConnection conn;
 
@@ -22,7 +25,7 @@
     cl($"[;38;5;27;1m[{ctx.Request.Path}][0m");
 
     if((await this.GetCurrentUser() is not null)
-      || (ctx.Request.Path.ToString() == "/login")) {
+      || (noauth.Contains(ctx.Request.Path.ToString()[1..]))) {
       await nxt(ctx);
     } else {
       ctx.Response.StatusCode = 403;
@@ -82,9 +85,11 @@ class XXX {
 
     app.MapPost("/env", () => env());
 
+    app.MapPost("/hailstone", (JsonElement o) =>
+      ((o._int("n") is int n) && n > 0) ? collatz([n]) : null); 
+
     app.MapPost("/now", async (Auth auth, SqlConnection conn) => {
       await conn.OpenAsync();
-
       using var cmd = conn.CreateCommand();
       cmd.CommandText =
       """
@@ -128,7 +133,6 @@ class XXX {
       }
 
       await conn.OpenAsync();
-
       using var user_cmd = conn.CreateCommand();
       user_cmd.CommandText
         = "select id, passwd from usuario where username=@u";
@@ -203,6 +207,11 @@ class XXX {
       return Results.Ok();
     });
 
+    var _user = app.MapGroup("/user");
+    _user.MapPost("/list",   User.List);
+    _user.MapPost("/create", User.Create);
+    _user.MapPost("/delete", User.Delete);
+    _user.MapPost("/resetpass", User.ResetPass);
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();
