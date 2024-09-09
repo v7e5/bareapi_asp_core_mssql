@@ -1,7 +1,22 @@
 #!/usr/bin/zsh
 set -euo pipefail
 
+kx() {
+cat <<EOL
+{}
+EOL
+}
+
 x() {
+cat <<EOL
+{
+  "username": "admin",
+  "passwd": "forget"
+}
+EOL
+}
+
+kx() {
 cat <<EOL
 {
   "boolt": true,

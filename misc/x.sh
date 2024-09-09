@@ -20,6 +20,9 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    now
+    login
+    'logout'
     env
     'echo'
   )
