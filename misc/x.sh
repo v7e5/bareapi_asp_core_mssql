@@ -20,12 +20,16 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    category/list
+    category/delete
+    category/update
+    category/create
+    login
     hailstone
     'echo'
     env
     now
     'logout'
-    login
     user/resetpass
     user/list
     user/create

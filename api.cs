@@ -213,6 +213,12 @@ class XXX {
     _user.MapPost("/delete", User.Delete);
     _user.MapPost("/resetpass", User.ResetPass);
 
+    var _category = app.MapGroup("/category");
+    _category.MapPost("/list",   Category.List);
+    _category.MapPost("/create", Category.Create);
+    _category.MapPost("/update", Category.Update);
+    _category.MapPost("/delete", Category.Delete);
+
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();
   }
