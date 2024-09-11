@@ -109,15 +109,15 @@ curl -vs -X POST \
   -H 'accept: application/json' \
   --data-binary "$(cat <<EOL
 {
-  "id": long (optional),
+  "id": int (optional),
   "task": string (optional),
   "done": bool (optional),
   "due_from": unix timestamp (long, optional),
   "due_to": unix timestamp (long, optional),
-  "categories": [array of category ids (long, optional)],
-  "cursor_init": long (optional),
-  "cursor_next": long (optional),
-  "cursor_prev": long (optional)
+  "categories": [array of category ids (int, optional)],
+  "cursor_init": int (optional),
+  "cursor_next": int (optional),
+  "cursor_prev": int (optional)
 }
 EOL
 )" \
@@ -133,7 +133,7 @@ POST: `/todo/create`
   "task": string (required),
   "done": bool (optional),
   "due": unix timestamp (long, optional),
-  "categories": [array of category ids (long, optional)]
+  "categories": [array of category ids (int, optional)]
 }
 ```
 
@@ -142,7 +142,7 @@ POST: `/todo/update`
 
 ```json
 {
-  "id": long (required),
+  "id": int (required),
   "task": string,
   "done": bool,
   "due": unix timestamp,
@@ -155,7 +155,7 @@ POST: `/todo/delete`
 
 ```json
 {
-  "id": long (required)
+  "id": int (required)
 }
 ```
 
@@ -176,7 +176,7 @@ POST: `/user/delete`
 
 ```json
 {
-  "id": long (required)
+  "id": int (required)
 }
 ```
 #### user: list
@@ -184,7 +184,7 @@ POST: `/user/list`
 
 ```json
 {
-  "id": long (optional),
+  "id": int (optional),
   "username": string (optional)
 }
 ```
@@ -206,7 +206,7 @@ POST: `/category/list`
 
 ```json
 {
-  "id": long (optional),
+  "id": int (optional),
   "name": string (optional),
   "color": string (optional)
 }
@@ -217,7 +217,7 @@ POST: `/category/update`
 
 ```json
 {
-  "id": long (required),
+  "id": int (required),
   "name": string,
   "color": string
 }
@@ -228,6 +228,6 @@ POST: `/category/delete`
 
 ```json
 {
-  "id": long (required)
+  "id": int (required)
 }
 ```
