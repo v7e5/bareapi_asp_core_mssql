@@ -142,7 +142,7 @@ class XXX {
         .ToDictArray().FirstOrDefault();
 
       if(user is null
-        || (((string) user["passwd"]).Split(':') is var arr
+        || (user["passwd"]?.ToString()?.Split(':') is string[] arr
           && !CryptographicOperations.FixedTimeEquals(
           deriveKey(
             password: passwd!,
@@ -153,7 +153,7 @@ class XXX {
         return Results.BadRequest(new {error = "incorrect user/pass"});
       }
 
-      var userid = (int) user["id"];
+      var userid = (int?) user["id"];
 
       using var sess_del = conn.CreateCommand();
       sess_del.CommandText = "delete from sesion where userid=@u";
@@ -197,7 +197,7 @@ class XXX {
       using var sess_del = conn.CreateCommand();
       sess_del.CommandText = "delete from sesion where userid=@u";
       sess_del.Parameters.AddWithValue("u", await auth.GetCurrentUser());
-      sess_del.ExecuteNonQuery();
+      await sess_del.ExecuteNonQueryAsync();
 
       ctx.Response.Headers.Append(
         "set-cookie", "_id="
@@ -218,6 +218,27 @@ class XXX {
     _category.MapPost("/create", Category.Create);
     _category.MapPost("/update", Category.Update);
     _category.MapPost("/delete", Category.Delete);
+
+    var _todo = app.MapGroup("/todo");
+    _todo.MapPost("/list",   Todo.List);
+    _todo.MapPost("/create", Todo.Create);
+    _todo.MapPost("/update", Todo.Update);
+    _todo.MapPost("/delete", Todo.Delete);
+
+    app.MapPost("/q", async (
+      SqlConnection conn, JsonElement o
+    ) => {
+      await conn.OpenAsync();
+      using var cmd = conn.CreateCommand();
+      cmd.CommandText = o._str("q") ?? "select @@version";
+
+      return Results.Ok(
+        Regex.Match(
+          cmd.CommandText, @"^(select|sp_columns)",
+          RegexOptions.IgnoreCase | RegexOptions.CultureInvariant
+        ).Success ? (await cmd.ExecuteReaderAsync()).ToDictArray()
+          : await cmd.ExecuteNonQueryAsync());
+    });
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();

@@ -7,13 +7,51 @@ cat <<EOL
 EOL
 }
 
-x() {
+kx() {
+  ./misc/q.mjs
+}
+
+kx() {
+cat <<EOL
+{
+  "kid": 29,
+  "task": "1",
+  "kcursor_init": 1,
+  "kcursor_next": 22,
+  "kcursor_prev": 11,
+  "kcategories":[23,71],
+  "kdue_to":  $(date --date=" 2024-12-7 6:30AM" +%s 2> /dev/null || echo -n null),
+  "kdone": true
+}
+EOL
+}
+
+kx() {
+cat <<EOL
+{
+  "task": "tmp 1",
+  "due":  $(date --date=" 2025-9-31 6:30AM" +%s 2> /dev/null || echo -n null),
+  "done": false,
+  "categories":[11, 23]
+}
+EOL
+}
+
+kx() {
+cat <<EOL
+  [{"name": "dumz", "color": "blue"}]
+EOL
+}
+
+kx() {
 cat <<EOL
   {
-    "id": 79
+    "username": "kjv",
+    "passwd": "forget"
   }
 EOL
 }
+
 
 kx() {
 cat <<EOL

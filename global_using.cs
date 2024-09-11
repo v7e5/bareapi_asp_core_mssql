@@ -7,6 +7,7 @@ global using System.Threading.Tasks;
 global using System.Collections.Frozen;
 global using System.Collections.Generic;
 global using System.Security.Cryptography;
+global using System.Text.RegularExpressions;
 
 global using Microsoft.Data.SqlClient;
 

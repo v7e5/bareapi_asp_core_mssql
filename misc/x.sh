@@ -20,16 +20,21 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    todo/list
+    q
+    now
+    todo/create
+    todo/delete
+    todo/update
+    login
     category/list
+    category/create
+    'logout'
     category/delete
     category/update
-    category/create
-    login
     hailstone
     'echo'
     env
-    now
-    'logout'
     user/resetpass
     user/list
     user/create
@@ -52,7 +57,6 @@ w() {
   local a=(
     x.sh
     q.sh
-    x.sql
     q.sql
   )
 
@@ -62,12 +66,7 @@ w() {
           clear -x
           cl -b 27  -f 51 -o '------------------------------------------------'
           echo
-          case ${f} in
-            x.sh) ./misc/x.sh -c || :;;
-            q.sh) ./misc/x.sh -c || :;;
-            q.sql)./misc/x.sh -c || :;;
-            x.sql) cat ./misc/${f} | sqlite3 api.db || :;;
-          esac
+          ./misc/x.sh -c || :
         fi
       done
 }
