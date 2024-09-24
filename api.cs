@@ -81,7 +81,16 @@ class XXX {
     app.UseExceptionHandler();
     app.UseDeveloperExceptionPage();
 
-    app.MapPost("/echo", (JsonElement o) => o);
+    app.MapPost("/echo", async (JsonElement? o) => {
+      if(o?._int("delay") is int n && n > 0) {
+        await Task.Delay(n);
+      }
+
+      return new {
+        t = DateTimeOffset.UtcNow.ToLocalTime().ToString(),
+        o = (o?.ValueKind is JsonValueKind.Undefined) ? null : o,
+      };
+    });
 
     app.MapPost("/env", () => env());
 
@@ -208,9 +217,10 @@ class XXX {
     });
 
     var _user = app.MapGroup("/user");
-    _user.MapPost("/list",   User.List);
-    _user.MapPost("/create", User.Create);
-    _user.MapPost("/delete", User.Delete);
+    _user.MapPost("/list",      User.List);
+    _user.MapPost("/create",    User.Create);
+    _user.MapPost("/delete",    User.Delete);
+    _user.MapPost("/profile",   User.Profile);
     _user.MapPost("/resetpass", User.ResetPass);
 
     var _category = app.MapGroup("/category");

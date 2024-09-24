@@ -43,7 +43,7 @@ cat <<EOL
 EOL
 }
 
-kx() {
+x() {
 cat <<EOL
   {
     "username": "kjv",

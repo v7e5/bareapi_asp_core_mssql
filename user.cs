@@ -112,4 +112,17 @@ static class User {
 
     return Results.Ok();
   }
+
+  public static async Task<IResult> Profile(
+    Auth auth, SqlConnection conn
+  ) {
+    await conn.OpenAsync();
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText = "select id, username as name from usuario where id=@id";
+    cmd.Parameters.AddWithValue("id", await auth.GetCurrentUser());
+
+    return Results.Ok(new {
+      user = (await cmd.ExecuteReaderAsync()).ToDictArray().FirstOrDefault()
+    });
+  }
 }

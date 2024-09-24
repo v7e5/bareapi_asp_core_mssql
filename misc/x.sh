@@ -20,20 +20,21 @@ ccc() {
   [[ ! -f ${cke} ]] && touch ${cke}
 
   local a=(
+    user/profile
+    login
+    'echo'
     todo/list
     q
     now
     todo/create
     todo/delete
     todo/update
-    login
     category/list
     category/create
     'logout'
     category/delete
     category/update
     hailstone
-    'echo'
     env
     user/resetpass
     user/list
