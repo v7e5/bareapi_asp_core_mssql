@@ -154,7 +154,7 @@ class XXX {
         || (user["passwd"]?.ToString()?.Split(':') is string[] arr
           && !CryptographicOperations.FixedTimeEquals(
                 deriveKey(
-                  password: login.passwd,
+                  password: passwd!,
                   salt: Convert.FromBase64String(arr[0])
                 ),
                 Convert.FromBase64String(arr[1])
