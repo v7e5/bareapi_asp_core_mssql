@@ -153,11 +153,12 @@ class XXX {
       if(user is null
         || (user["passwd"]?.ToString()?.Split(':') is string[] arr
           && !CryptographicOperations.FixedTimeEquals(
-          deriveKey(
-            password: passwd!,
-            salt: Convert.FromBase64String(arr[0])
-          ),
-          Convert.FromBase64String(arr[1])))
+                deriveKey(
+                  password: login.passwd,
+                  salt: Convert.FromBase64String(arr[0])
+                ),
+                Convert.FromBase64String(arr[1])
+              ))
         ) {
         return Results.BadRequest(new {error = "incorrect user/pass"});
       }
