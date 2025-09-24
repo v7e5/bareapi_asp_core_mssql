@@ -1,6 +1,6 @@
-# Barebones Todo Minimal API - ASP.NET Core 8 (MSSQL)
+# Barebones Todo Minimal API - ASP.NET Core 9 (MSSQL)
 
-A sample minimal todo list api in C# with ASP.NET Core 8. This project uses
+A sample minimal todo list api in C# with ASP.NET Core 9. This project uses
 SQLServer/MSSQL for database. Check out
 [/v7e5/bareapi_asp_core](https://github.com/v7e5/bareapi_asp_core) for a
 version that uses Sqlite.
@@ -54,7 +54,7 @@ curl -vs -X POST \
   --data-binary "$(cat <<EOL
 {
   "username": string (required),
-  "passwd": string (required)
+  "password": string (required)
 }
 EOL
 )" \

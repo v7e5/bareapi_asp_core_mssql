@@ -2,6 +2,83 @@
 set -euo pipefail
 
 cke='./misc/cookie'
+[[ ! -f ${cke} ]] && touch ${cke}
+
+getpost=
+
+get() {
+  local a=(
+    env
+    hailstone
+    img
+    pdf
+  )
+
+  local u='http://0.0.0.0:8000/'${a[1]}
+  local q=$(./misc/q.sh ${a[1]})
+
+  if [[ ${q} != '{}' ]]; then
+    u=${u}'?'$(echo -n ${q} \
+      | tr -d '[:space:]' | tr ',' '&' | tr ':' '=' \
+      | sed -e 's/{\([^}]\+\)}/\1/' | tr -d '"')
+  fi
+
+  cl -o -b 17 -f 15 ${u}'\n'
+
+
+  curl -vs -X GET \
+    --cookie ${cke} \
+    --cookie-jar ${cke} -- ${u}
+}
+
+post() {
+  echo 'poss'
+
+  local a=(
+    cg
+    ecco
+    env
+    hailstone
+    img
+    now
+    pdf
+
+    login
+    logout
+
+    category/create
+    category/delete
+    category/list
+    category/update
+
+    todo/create
+    todo/delete
+    todo/list
+    todo/update
+
+    user/create
+    user/delete
+    user/list
+    user/profile
+    user/resetpass
+  )
+
+  local u='http://0.0.0.0:8000/'${a[1]}
+  local q=$(./misc/q.sh ${a[1]})
+
+  cl -o -b 17 -f 14 ${u}'\n'
+
+  curl -s -X POST \
+    --cookie ${cke} \
+    --cookie-jar ${cke} \
+    -H 'content-type: application/json' \
+    -H 'accept: application/json' \
+    --data-binary ${q} -- ${u} | jq
+}
+
+req() {
+  [[ -v getpost ]] && post || get
+}
 
 bulk() {
   while IFS= read -r l; do
@@ -15,50 +92,11 @@ bulk() {
   done <./misc/todo_2.txt
 }
 
-ccc() {
-  local _i=0
-  [[ ! -f ${cke} ]] && touch ${cke}
-
-  local a=(
-    user/profile
-    login
-    'echo'
-    todo/list
-    q
-    now
-    todo/create
-    todo/delete
-    todo/update
-    category/list
-    category/create
-    'logout'
-    category/delete
-    category/update
-    hailstone
-    env
-    user/resetpass
-    user/list
-    user/create
-    user/delete
-  )
-
-  #-o /dev/null \
-  #--write-out "@./write_out_fmt.yml" \
-  #--data-binary "$(./misc/q.sh -x)" \
-  curl -vs -X POST \
-    --cookie ${cke} \
-    --cookie-jar ${cke} \
-    -H 'content-type: application/json' \
-    -H 'accept: application/json' \
-    --data-binary "$(./misc/q.sh -x)" \
-    'http://0.0.0.0:8000/'${a[1]} | jq
-}
-
 w() {
   local a=(
     x.sh
     q.sh
-    q.sql
+    x.sql
   )
 
   inotifywait -mr -e close_write -e delete -e moved_to ./ \
@@ -67,7 +105,11 @@ w() {
           clear -x
           cl -b 27  -f 51 -o '------------------------------------------------'
           echo
-          ./misc/x.sh -c || :
+          case ${f} in
+            x.sh) ./misc/x.sh -r || :;;
+            q.sh) ./misc/x.sh -r || :;;
+            x.sql) cat ./misc/${f} | sqlite3 api.db || :;;
+          esac
         fi
       done
 }

@@ -1,12 +1,13 @@
 class Auth: IMiddleware {
   private static readonly string[] noauth = {
-    "login", "hailstone", "echo", "env", "now"
-  }; 
+    "login", "hailstone", "ecco", "env", "now", "cg",
+    "pdf" , "img"
+  };
   private readonly HttpContext? ctx;
   private readonly SqlConnection conn;
 
   public Auth(IHttpContextAccessor acx, SqlConnection conn) =>
-    (this.ctx, this.conn) = (acx.HttpContext, conn);
+    (this.conn, this.ctx) = (conn, acx.HttpContext);
 
   public async Task<int?> GetCurrentUser() {
     if(this.ctx?.Request.Cookies.TryGetValue("_id", out var k) ?? false) {
@@ -80,7 +81,7 @@ class XXX {
     app.UseExceptionHandler();
     app.UseDeveloperExceptionPage();
 
-    app.MapPost("/echo", async (JsonElement? o) => {
+    app.MapPost("/ecco", async (JsonElement? o) => {
       if(o?._int("delay") is int n && n > 0) {
         await Task.Delay(n);
       }
@@ -91,10 +92,49 @@ class XXX {
       };
     });
 
+    app.MapPost("/cg", () => new ConGen());
+
     app.MapPost("/env", () => env());
+
+    app.MapGet("/env", async (int? n) => {
+      if(n is not null) {
+        await Task.Delay((int) n);
+      }
+
+      return env();
+    });
+
+    static async Task _pdf(IWebHostEnvironment env, HttpContext ctx) {
+      ctx.Response.ContentType = "application/pdf";
+
+      using (var fs = new FileStream(
+        Path.Combine(env.WebRootPath, "thinkpad_e14_gen_2_amd_spec.pdf"),
+        FileMode.Open, FileAccess.Read
+      )) {
+        await fs.CopyToAsync(ctx.Response.Body);
+      }
+    }
+
+    static async Task _img(IWebHostEnvironment env, HttpContext ctx) {
+      ctx.Response.ContentType = "image/png";
+
+      using (var fs = new FileStream(
+        Path.Combine(env.WebRootPath, "tabriz.png"),
+        FileMode.Open, FileAccess.Read
+      )) {
+        await fs.CopyToAsync(ctx.Response.Body);
+      }
+    }
+
+    app.MapGet("/pdf", _pdf);
+    app.MapPost("/pdf", _pdf);
+    app.MapGet("/img", _img);
+    app.MapPost("/img", _img);
 
     app.MapPost("/hailstone", (JsonElement o) =>
       ((o._int("n") is int n) && n > 0) ? collatz([n]) : null); 
+
+    app.MapGet("/hailstone", (int n) => (n > 0) ? collatz([n]) : null); 
 
     app.MapPost("/now", async (Auth auth, SqlConnection conn) => {
       await conn.OpenAsync();
@@ -134,9 +174,9 @@ class XXX {
       }
 
       string? username = o._str("username");
-      string? passwd = o._str("passwd");
+      string? password= o._str("password");
 
-      if((username, passwd) is (null, null)) {
+      if((username, password) is (null, null)) {
         return Results.BadRequest(new {error = "need a name and password"});
       }
 
@@ -150,10 +190,10 @@ class XXX {
         .ToDictArray().FirstOrDefault();
 
       if(user is null
-        || (user["passwd"]?.ToString()?.Split(':') is string[] arr
+        || (user["password"]?.ToString()?.Split(':') is string[] arr
           && !CryptographicOperations.FixedTimeEquals(
                 deriveKey(
-                  password: passwd!,
+                  password: password!,
                   salt: Convert.FromBase64String(arr[0])
                 ),
                 Convert.FromBase64String(arr[1])
@@ -216,12 +256,6 @@ class XXX {
       return Results.Ok();
     });
 
-    var _user = app.MapGroup("/user");
-    _user.MapPost("/list",      User.List);
-    _user.MapPost("/create",    User.Create);
-    _user.MapPost("/delete",    User.Delete);
-    _user.MapPost("/profile",   User.Profile);
-    _user.MapPost("/resetpass", User.ResetPass);
 
     var _category = app.MapGroup("/category");
     _category.MapPost("/list",   Category.List);
@@ -229,26 +263,19 @@ class XXX {
     _category.MapPost("/update", Category.Update);
     _category.MapPost("/delete", Category.Delete);
 
+    var _user = app.MapGroup("/user");
+    _user.MapPost("/list",      User.List);
+    _user.MapPost("/create",    User.Create);
+    _user.MapPost("/delete",    User.Delete);
+    _user.MapPost("/profile",   User.Profile);
+    _user.MapPost("/resetpass", User.ResetPass);
+
     var _todo = app.MapGroup("/todo");
     _todo.MapPost("/list",   Todo.List);
     _todo.MapPost("/create", Todo.Create);
     _todo.MapPost("/update", Todo.Update);
     _todo.MapPost("/delete", Todo.Delete);
 
-    app.MapPost("/q", async (
-      SqlConnection conn, JsonElement o
-    ) => {
-      await conn.OpenAsync();
-      using var cmd = conn.CreateCommand();
-      cmd.CommandText = o._str("q") ?? "select @@version";
-
-      return Results.Ok(
-        Regex.Match(
-          cmd.CommandText, @"^(select|sp_columns)",
-          RegexOptions.IgnoreCase | RegexOptions.CultureInvariant
-        ).Success ? (await cmd.ExecuteReaderAsync()).ToDictArray()
-          : await cmd.ExecuteNonQueryAsync());
-    });
 
     cl($"[48;5;227;38;5;0;1m{app.Environment.EnvironmentName}[0m");
     await app.RunAsync();

@@ -1,59 +1,100 @@
 #!/usr/bin/zsh
 set -euo pipefail
 
-kx() {
-cat <<EOL
-{}
-EOL
-}
-
-kx() {
-  ./misc/q.mjs
-}
-
-kx() {
+login() {
 cat <<EOL
 {
-  "kid": 29,
-  "task": "1",
-  "kcursor_init": 1,
-  "kcursor_next": 22,
-  "kcursor_prev": 11,
-  "kcategories":[23,71],
-  "kdue_to":  $(date --date=" 2024-12-7 6:30AM" +%s 2> /dev/null || echo -n null),
-  "kdone": true
+  "username": "admin",
+  "password": "forget"
+
 }
 EOL
 }
 
-kx() {
+hailstone() {
 cat <<EOL
 {
-  "task": "tmp 1",
-  "due":  $(date --date=" 2025-9-31 6:30AM" +%s 2> /dev/null || echo -n null),
+  "n": 3
+}
+EOL
+}
+
+category/list() {
+cat <<EOL
+{
+  "xname": "jkl"
+}
+EOL
+}
+
+category/create() {
+cat <<EOL
+[
+  {"name": "abc", "color": "ff0000"},
+  null,
+  {"name": "def", "color": "00ff00"},
+  {"name": "ghi", "color": "0000ff"},
+  111,
+  {"name": "jkl", "color": "000000"}
+]
+EOL
+}
+
+category/update() {
+cat <<EOL
+{
+  "id": 75,
+  "name": "axx"
+}
+EOL
+}
+
+category/delete() {
+cat <<EOL
+{
+  "id": 75
+}
+EOL
+}
+
+todo/create() {
+cat <<EOL
+{
+  "xid": 3,
+  "task": "dummy",
+  "due":  $(date --date=" 2025-9-30 6:30AM" +%s 2> /dev/null || echo -n null),
   "done": false,
-  "categories":[11, 23]
+  "categories":[71, 31]
 }
 EOL
 }
 
-kx() {
+todo/list() {
 cat <<EOL
-  [{"name": "dumz", "color": "blue"}]
+{
+  "id": 101,
+  "xtask": "dummy",
+  "xdue":  $(date --date=" 2025-9-30 6:30AM" +%s 2> /dev/null || echo -n null),
+  "xdone": false,
+  "xcategories":[71, 31]
+}
 EOL
 }
 
-x() {
+todo/update() {
 cat <<EOL
-  {
-    "username": "kjv",
-    "passwd": "forget"
-  }
+{
+  "id": 101,
+  "task": "dummy dummy",
+  "xdue":  $(date --date=" 2025-9-30 6:30AM" +%s 2> /dev/null || echo -n null),
+  "xdone": false,
+  "xcategories":[71, 31]
+}
 EOL
 }
 
 
-kx() {
+ecco() {
 cat <<EOL
 {
   "boolt": true,
@@ -86,16 +127,21 @@ cat <<EOL
 EOL
 }
 
-_k=(${(ok)functions:#_*})
-_v=(${(oM)_k#[a-z]*})
-typeset -A _o
-_o=(${_v:^_k})
 
-eval 'zparseopts -D -E -F -a _a '${_v}
+x() {
+cat <<EOL
+{
+  "n": 10000,
+  "cursor_init": 1,
+  "cursor_next": 374,
+  "filter_text" : "ff"
+}
+EOL
+}
 
-[[ ${#_a} -eq 0  ]] && \
-  paste -d ' ' <(print -l '\-'${(j:\n-:)_v}) <(print -l ${_k}) && exit
 
-_a=('$_o['${^_a#-}']')
-eval ${(F)_a}
+_k=(${(k)functions})
+
+(( ${_k[(Ie)${@}]} )) && eval ${@} || echo -n '{}'
+
 exit
