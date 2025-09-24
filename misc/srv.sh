@@ -7,15 +7,18 @@ set -euo pipefail
 
 
 purge() {
-  rm -rf bin obj
+  rm -rfv bin obj
+  #dotnet clean -c Release api.csproj
 }
 
 bld() {
-  dotnet build -r linux-x64 -c Release api.csproj
+  #dotnet build  \
+  dotnet build --source ${HOME}/.nuget/packages \
+    -r linux-x64 -c Release api.csproj
 }
 
 xxx() {
-  ./bin/Release/net8.0/linux-x64/api
+  ./bin/Release/net9.0/linux-x64/api
 }
 
 addpkg() {
