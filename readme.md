@@ -91,6 +91,11 @@ POST, GET: `/img`
 
 Returns a sample PNG image file stream from the static directory.
 
+#### pdf
+POST, GET: `/pdf`
+
+Returns a sample PDF file stream from the static directory.
+
 #### login
 POST: `/login`
 
